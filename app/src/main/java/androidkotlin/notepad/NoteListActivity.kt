@@ -4,12 +4,16 @@ import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Parcelable
 import android.util.Log
 import android.view.View
 import android.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import androidkotlin.notepad.utils.deleteNote
+import androidkotlin.notepad.utils.loadNotes
+import androidkotlin.notepad.utils.persistNote
 
 class NoteListActivity : AppCompatActivity(), View.OnClickListener {
 
@@ -22,10 +26,10 @@ class NoteListActivity : AppCompatActivity(), View.OnClickListener {
 
         findViewById<FloatingActionButton>(R.id.create_note_fab).setOnClickListener(this)
 
-        notes = mutableListOf<Note>()
-        notes.add(Note("Note 1", "test test"))
-        notes.add(Note("Mémo test", "ceci est une note de test"))
-        notes.add(Note("bla bla", "abcdefghijklmnopqrstuvwxyz"))
+        notes = loadNotes(this)
+//        notes.add(Note("Note 1", "test test"))
+//        notes.add(Note("Mémo test", "ceci est une note de test"))
+//        notes.add(Note("bla bla", "abcdefghijklmnopqrstuvwxyz"))
 
         adapter = NoteAdapter(notes, this)
 
@@ -69,6 +73,7 @@ class NoteListActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     fun saveNote(note: Note, noteIndex: Int) {
+        persistNote(this, note)
         if(noteIndex < 0){
             notes.add(0, note)
         }
@@ -84,6 +89,7 @@ class NoteListActivity : AppCompatActivity(), View.OnClickListener {
         }
         else{
             val note = notes.removeAt(noteIndex)
+            deleteNote(this, note)
             adapter.notifyDataSetChanged()
         }
     }
@@ -95,7 +101,7 @@ class NoteListActivity : AppCompatActivity(), View.OnClickListener {
     fun showNoteDetail(noteIndex: Int){
         val note = if(noteIndex < 0) Note() else notes[noteIndex]
         val intent = Intent(this, NoteDetailActivity:: class.java)
-        intent.putExtra(NoteDetailActivity.EXTRA_NOTE, note)
+        intent.putExtra(NoteDetailActivity.EXTRA_NOTE, note as Parcelable)
         intent.putExtra(NoteDetailActivity.EXTRA_NOTE_INDEX, noteIndex)
         startActivityForResult(intent, NoteDetailActivity.REQUEST_EDIT_NOTE)
     }

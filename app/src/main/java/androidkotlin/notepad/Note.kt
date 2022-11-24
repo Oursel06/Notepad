@@ -3,7 +3,7 @@ package androidkotlin.notepad
 import android.os.Parcel
 import android.os.Parcelable
 
-data class Note(var title: String = "", var text: String = "", var filename: String = "") : Parcelable {
+data class Note(var title: String = "", var text: String = "", var filename: String = "") : Parcelable, java.io.Serializable {
     constructor(parcel: Parcel) : this(
         parcel.readString().toString(),
         parcel.readString().toString(),
@@ -22,6 +22,7 @@ data class Note(var title: String = "", var text: String = "", var filename: Str
     }
 
     companion object CREATOR : Parcelable.Creator<Note> {
+        private  val serialVersionUid: Long = 4242424242
         override fun createFromParcel(parcel: Parcel): Note {
             return Note(parcel)
         }
